@@ -1,5 +1,5 @@
 import React from 'react'
-import { Row, Button, ButtonToolbar, Col, Panel } from 'react-bootstrap'
+import { Button, ButtonToolbar } from 'react-bootstrap'
 const propTypes = {}
 
 class App extends React.Component {
