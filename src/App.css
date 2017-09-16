@@ -1,0 +1,32 @@
+body {
+  background-color: #dddddd;
+}
+.App {
+  width: 960px;
+  text-align: center;
+  background-color: 'red';
+}
+
+.scoreboard {
+  padding: 20px;
+}
+
+.previous-balls {
+  float: left;
+  margin-right: 10px;
+  margin-bottom: 20px;
+  background-color: red;
+}
+
+.bingo-entry {
+  width: 12%;
+  background-color: lightgray;
+  text-align: center;
+  padding: 18px;
+  border-bottom: 1px solid gray;
+  border-right: 1px solid gray;
+}
+
+.selected {
+  background-color: gold;
+}
