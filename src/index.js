@@ -1,12 +1,4 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import './index.css'
-
-class App extends React.Component {
-  render() {
-    return (
-      <p>App class component is working</p>
-    )
-  }
-}
+import App from './App'
 ReactDOM.render(<App />, document.getElementById('root'))
