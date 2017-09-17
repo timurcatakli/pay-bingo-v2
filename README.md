@@ -9,3 +9,8 @@ Start: node .
 2- material ui
 3- css loader
 4- index.html
+
+
+// start game
+serves 4 bingo cards
+set status on
