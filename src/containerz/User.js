@@ -14,51 +14,27 @@ drawnBallsSet.add(36)
 drawnBallsSet.add(99)
 drawnBallsSet.add(35)
 drawnBallsSet.add(51)
-const bingoBoard = new Set()
-bingoBoard.add(9)
-bingoBoard.add(36)
-bingoBoard.add(35)
-bingoBoard.add(86)
-bingoBoard.add(12)
-bingoBoard.add(17)
-bingoBoard.add(24)
-bingoBoard.add(32)
-bingoBoard.add(77)
-bingoBoard.add(2)
-bingoBoard.add(22)
-bingoBoard.add(62)
-bingoBoard.add(8)
-bingoBoard.add(57)
-bingoBoard.add(51)
-bingoBoard.add(41)
-bingoBoard.add(16)
-bingoBoard.add(82)
-bingoBoard.add(25)
-bingoBoard.add(94)
-bingoBoard.add(29)
-bingoBoard.add(27)
-bingoBoard.add(1)
-bingoBoard.add(49)
-bingoBoard.add(42)
 
 class User extends React.Component {
   constructor(props) {
     super(props)
-    this.state = {bingo: {}}
+    this.state = {
+      bingo: {},
+      bingoBoard: new Set()
+    }
   }
 
   componentDidMount() {
+    this.setState({bingoBoard: generateBingoBoard()})
     this.socket = io('/')
     this.socket.on('bingo', bingo => {
       const x = Object.assign(bingo)
-      console.log(x)
       x.drawn_balls = new Set(bingo.drawn_balls)
       this.setState({bingo: x})
     })
   }
 
   render() {
-    console.log(generateBingoBoard())
     const gameMode = this.state.bingo.game_mode
     const bingoObject = this.state.bingo
     const showModal = gameMode === 'on' ? false : true
@@ -68,12 +44,12 @@ class User extends React.Component {
           <Col md={12}><ScoreBoard bingo={bingoObject} /></Col>
         </Row>
         <Row>
-          <Col md={6}><BingoBoard bingoBoard={bingoBoard} bingo={bingoObject} /></Col>
-          <Col md={6}><BingoBoard bingoBoard={bingoBoard} bingo={bingoObject} /></Col>
+          <Col md={6}><BingoBoard bingoBoard={this.state.bingoBoard[0]} bingo={bingoObject} /></Col>
+          <Col md={6}><BingoBoard bingoBoard={this.state.bingoBoard[1]} bingo={bingoObject} /></Col>
         </Row>
         <Row>
-          <Col md={6}><BingoBoard bingoBoard={bingoBoard} bingo={bingoObject} /></Col>
-          <Col md={6}><BingoBoard bingoBoard={bingoBoard} bingo={bingoObject} /></Col>
+          <Col md={6}><BingoBoard bingoBoard={this.state.bingoBoard[2]} bingo={bingoObject} /></Col>
+          <Col md={6}><BingoBoard bingoBoard={this.state.bingoBoard[3]} bingo={bingoObject} /></Col>
         </Row>
         <Modal show={showModal}>
           <Modal.Header>

@@ -5,7 +5,7 @@ import '../containerz/App.css'
 
 const propTypes = {
   bingo: PropTypes.object.isRequired,
-  bingoBoard: PropTypes.object.isRequired
+  bingoBoard: PropTypes.object
 }
 const style = {
   button: {
@@ -19,9 +19,9 @@ const style = {
   }
 }
 const BingoBoard = (props) => {
-  const bingoBoard = props.bingoBoard.values()
+  const bingoBoard = props.bingoBoard || new Set()
   const drawnBalls = props.bingo.drawn_balls || new Set()
-  const boardEntries = Array.from(bingoBoard).map((ball, index) => {
+  const boardEntries = Array.from(bingoBoard.values()).map((ball, index) => {
     const selectedStyle = drawnBalls.has(ball) ? 'success' : 'default'
     const tag = <Button key={`key-${index}`} bsStyle={selectedStyle} style={style.button}>{ball}</Button>
     return tag
