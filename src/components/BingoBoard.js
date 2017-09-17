@@ -1,28 +1,35 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import Grid from 'material-ui/Grid'
-import Paper from 'material-ui/Paper'
-import '../App.css'
+import { ButtonToolbar, ButtonGroup, Button } from 'react-bootstrap'
+import '../containerz/App.css'
 
 const propTypes = {
   bingo: PropTypes.object.isRequired,
   bingoBoard: PropTypes.object.isRequired
 }
-
+const style = {
+  button: {
+    fontSize: '24px',
+    width: '60px',
+    height: '60px'
+  },
+  buttonToolbar: {
+    width: '320px',
+    marginBottom: '40px'
+  }
+}
 const BingoBoard = (props) => {
   const bingoBoard = props.bingoBoard.values()
-  const drawnBalls = props.bingo.drawn_balls
-  const selectedStyle = 'selected'
+  const drawnBalls = props.bingo.drawn_balls || new Set()
   const boardEntries = Array.from(bingoBoard).map((ball, index) => {
-    if (drawnBalls.has(ball)) { return <Grid key={`key-${index}`} className={`bingo-entry ${selectedStyle}`}>{ball}</Grid> }
-    return <Grid key={`key-${index}`} className="bingo-entry">{ball}</Grid>
+    const selectedStyle = drawnBalls.has(ball) ? 'success' : 'default'
+    const tag = <Button key={`key-${index}`} bsStyle={selectedStyle} style={style.button}>{ball}</Button>
+    return tag
   })
   return (
-    <Grid item md={12}>
-      <Paper>
-        <Grid container style={{padding: '0px'}}>{boardEntries}</Grid>
-      </Paper>
-    </Grid>
+    <ButtonToolbar style={style.buttonToolbar}>
+      <ButtonGroup>{boardEntries}</ButtonGroup>
+    </ButtonToolbar>
   )
 }
 

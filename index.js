@@ -1,4 +1,5 @@
 const express = require('express')
+const path = require('path')
 const http = require('http')
 const bodyParser = require('body-parser')
 const socketIo = require('socket.io')
@@ -13,6 +14,11 @@ const io = socketIo(server)
 app.use(express.static(__dirname + '/public'))
 app.use(webpackDevMiddleware(webpack(webpackConfig)))
 app.use(bodyParser.urlencoded({ extended: false }))
+
+// Handles all routes so you do not get a not found error
+app.get('*', function(request, response) {
+  response.sendFile(path.resolve(__dirname, 'public', 'index.html'))
+})
 
 app.post('/', (req, res) => {
   const { Body, From, MediaUrl0 } = req.body
@@ -30,11 +36,8 @@ app.post('/', (req, res) => {
 })
 
 io.on('connection', socket => {
-  socket.on('message', body => {
-    socket.broadcast.emit('message', {
-      body,
-      from: socket.id.slice(8)
-    })
+  socket.on('bingo', bingo => {
+    socket.broadcast.emit('bingo', bingo)
   })
 })
 

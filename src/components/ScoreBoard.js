@@ -1,52 +1,59 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import Grid from 'material-ui/Grid'
-import Paper from 'material-ui/Paper'
-import Avatar from 'material-ui/Avatar'
-import deepOrange from 'material-ui/colors/deepOrange'
-import deepPurple from 'material-ui/colors/deepPurple'
-import '../App.css'
+import { Jumbotron, Button, Grid, Col, Row } from 'react-bootstrap'
+import '../containerz/App.css'
 
-const styles = {
-  orangeAvatar: {
-    color: '#fff',
-    backgroundColor: deepOrange[500]
-  },
-  purpleAvatar: {
-    color: '#fff',
-    backgroundColor: deepPurple[500]
+const style = {
+  button: {
+    fontSize: '24px',
+    width: '60px',
+    height: '60px',
+    marginRight: '4px'
   }
 }
-
 const propTypes = {
   bingo: PropTypes.shape({
-    game_mode: PropTypes.bool.isRequired,
-    drawn_balls: PropTypes.object.isRequired
+    game_mode: PropTypes.oneOf(['on', 'off', 'paused']),
+    drawn_balls: PropTypes.object
   })
 }
 
 const ScoreBoard = (props) => {
-  const gameMode = props.bingo.game_mode || false
-  const drawnBalls = props.bingo.drawn_balls.values()
-  const lastBall = drawnBalls.next().value
-  const previousBalls = Array.from(drawnBalls).map((ball, index) => {
-    return <Avatar style={styles.orangeAvatar} className="previous-balls" key={index}>{ball}</Avatar>
-  })
+  const {bingo} = props
+  const drawnBalls = bingo.drawn_balls ? Array.from(bingo.drawn_balls) : []
+  const gameOn = drawnBalls.length > 0 ? true : false
+  let lastBall = null
+  let previousBalls = null
+  if (drawnBalls.length > 0) {
+    lastBall = drawnBalls.pop()
+    previousBalls = drawnBalls.reverse().map((ball, index) => {
+      return <Button style={style.button} key={index}>{ball}</Button>
+    })
+  }
+
   return (
-    <Grid item md={12}>
-      <Paper elevation={0} className="scoreboard">
-        { gameMode ?
-          <Grid container>
-            <Grid item md={2}>Last Ball</Grid>
-            <Grid item md={10}>Previous Balls</Grid>
-            <Grid item md={2}><Avatar style={styles.purpleAvatar} className="previous-balls">{lastBall}</Avatar></Grid>
-            <Grid item md={10}>{previousBalls}</Grid>
-          </Grid>
-          :
-          <h2>Please be patient! Your admin will start a new game, soon...</h2>
-        }
-      </Paper>
-    </Grid>
+    <Jumbotron>
+      { gameOn
+        ?
+        <Grid>
+          <Row>
+            <Col md={2}><h3>Last Ball</h3></Col>
+            <Col md={10}><h3>Previous Balls</h3></Col>
+          </Row>
+          <Row>
+            <Col md={2}><Button bsStyle="primary" style={style.button}>{lastBall}</Button></Col>
+            <Col md={10}>{previousBalls}</Col>
+          </Row>
+        </Grid>
+        :
+        <Grid>
+          <Row>
+            <Col md={12}><h3>First ball will be drawn soon...</h3></Col>
+          </Row>
+
+        </Grid>
+      }
+    </Jumbotron>
   )
 }
 
