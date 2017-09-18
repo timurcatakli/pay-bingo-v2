@@ -1,5 +1,6 @@
 import React from 'react'
 import io from 'socket.io-client'
+import axios from 'axios'
 import { Jumbotron, Button, Grid, Col, Row } from 'react-bootstrap'
 
 class Admin extends React.Component {
@@ -21,48 +22,58 @@ class Admin extends React.Component {
   }
 
   render() {
-    const gameOn = this.state.bingo.game_mode === 'on' ? true : false
+    const gameMode = this.state.bingo.game_mode
+    const gameOn = gameMode === 'on' ? true : false
     return (
       <Jumbotron>
         <h3>Admin Console</h3>
         <p>
           {gameOn
             ?
-            <Button bsStyle="primary" onClick={this.handleStart}>Pause Game</Button>
+            <Button bsStyle="primary" onClick={this.handlePause}>Pause Game</Button>
             :
-            <Button bsStyle="primary" onClick={this.handleStart}>Start Game</Button>
+            <Button bsStyle="info" onClick={this.handleStart}>Start/Continue Game</Button>
           }
 
           &nbsp; &nbsp; &nbsp; &nbsp;
-          <Button bsStyle="success" onClick={this.handleDrawBall}>Draw Ball</Button>
+          <Button bsStyle="success" disabled={!gameOn} onClick={this.handleDrawBall}>Draw Ball</Button>
         </p>
       </Jumbotron>
     )
   }
 
   handleDrawBall = () => {
-    fetch('https://jsonplaceholder.typicode.com/posts')
-      .then(function(response) {
-        console.log(response)
-        return response
+    const url = 'http://localhost:3000/bingo/drawnballs'
+    axios.get(url)
+      .then((response) => {
+        const bingo = Object.assign(this.state.bingo)
+        if (bingo.game_mode === 'on') {
+          bingo.drawn_balls = response.data
+          this.setState({bingo})
+          this.socket.emit('bingo', bingo)
+        }
       })
+      .catch((error) => {
+        console.log(error)
+      })
+  }
 
-    console.log('handleDrawBall')
-    const bingo = Object.assign(this.state.bingo)
-    if (bingo.game_mode === 'on') {
-      const drawnBallsSet = bingo.drawn_balls
-      drawnBallsSet.push((Math.floor(Math.random() * 100) + 1 ))
-      bingo.drawn_balls = drawnBallsSet
-      this.setState({bingo})
-      this.socket.emit('bingo', bingo)
-    }
+  setAndEmit = (obj) => {
+    this.setState({bingo: obj})
+    this.socket.emit('bingo', obj)
   }
 
   handleStart = () => {
     const bingo = Object.assign(this.state.bingo)
     bingo.game_mode = 'on'
-    this.setState({bingo})
-    this.socket.emit('bingo', bingo)
+    this.setAndEmit(bingo)
+  }
+
+  handlePause = () => {
+    // immutable copy
+    const bingo = Object.assign(this.state.bingo)
+    bingo.game_mode = 'paused'
+    this.setAndEmit(bingo)
   }
 }
 

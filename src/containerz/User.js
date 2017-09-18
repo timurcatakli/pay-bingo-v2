@@ -1,26 +1,22 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import io from 'socket.io-client'
-import { Modal, Grid, Col, Row } from 'react-bootstrap'
+import axios from 'axios'
+import { Grid, Col, Row } from 'react-bootstrap'
 import BingoBoard from '../components/BingoBoard'
 import ScoreBoard from '../components/ScoreBoard'
+import NotificationModal from '../components/NotificationModal'
 import { generateBingoBoard } from '../utils/index'
-
-const propTypes = {}
-const drawnBallsSet = new Set()
-drawnBallsSet.add(1)
-drawnBallsSet.add(46)
-drawnBallsSet.add(36)
-drawnBallsSet.add(99)
-drawnBallsSet.add(35)
-drawnBallsSet.add(51)
 
 class User extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
       bingo: {},
-      bingoBoard: new Set()
+      bingoBoard: new Set(),
+      modal: {
+        title: 'PayPal Bingo Game',
+        body: 'Your Admin will start the game soon!'
+      }
     }
   }
 
@@ -28,9 +24,9 @@ class User extends React.Component {
     this.setState({bingoBoard: generateBingoBoard()})
     this.socket = io('/')
     this.socket.on('bingo', bingo => {
-      const x = Object.assign(bingo)
-      x.drawn_balls = new Set(bingo.drawn_balls)
-      this.setState({bingo: x})
+      const immutableBingo = Object.assign(bingo)
+      immutableBingo.drawn_balls = new Set(bingo.drawn_balls)
+      this.setState({bingo: immutableBingo})
     })
   }
 
@@ -43,27 +39,82 @@ class User extends React.Component {
         <Row>
           <Col md={12}><ScoreBoard bingo={bingoObject} /></Col>
         </Row>
-        <Row>
-          <Col md={6}><BingoBoard bingoBoard={this.state.bingoBoard[0]} bingo={bingoObject} /></Col>
-          <Col md={6}><BingoBoard bingoBoard={this.state.bingoBoard[1]} bingo={bingoObject} /></Col>
+        <Row style={{marginBottom: '40px'}}>
+          <Col md={6}>
+            <BingoBoard
+              bingoBoard={this.state.bingoBoard[0]}
+              bingo={bingoObject}
+              onBingoClaim={this.handleBingoClaim}
+              value="0"
+            />
+          </Col>
+          <Col md={6}>
+            <BingoBoard
+              bingoBoard={this.state.bingoBoard[1]}
+              bingo={bingoObject}
+              onBingoClaim={this.handleBingoClaim}
+              value="1"
+            />
+          </Col>
         </Row>
         <Row>
-          <Col md={6}><BingoBoard bingoBoard={this.state.bingoBoard[2]} bingo={bingoObject} /></Col>
-          <Col md={6}><BingoBoard bingoBoard={this.state.bingoBoard[3]} bingo={bingoObject} /></Col>
+          <Col md={6}>
+            <BingoBoard
+              bingoBoard={this.state.bingoBoard[2]}
+              bingo={bingoObject}
+              onBingoClaim={this.handleBingoClaim}
+              value="2"
+            />
+          </Col>
+          <Col md={6}>
+            <BingoBoard
+              bingoBoard={this.state.bingoBoard[3]}
+              bingo={bingoObject}
+              onBingoClaim={this.handleBingoClaim}
+              value="3"
+            />
+          </Col>
         </Row>
-        <Modal show={showModal}>
-          <Modal.Header>
-            <Modal.Title>PayPal Bingo Game</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <h4>Please be patient!</h4>
-            <p>Your admin will start the game, soon...</p>
-          </Modal.Body>
-        </Modal>
+        <NotificationModal
+          title={this.state.modal.title}
+          body={this.state.modal.body}
+          show={showModal}
+        />
       </Grid>
     )
   }
+
+  handleBingoClaim = (e) => {
+    const bingoBoardValues = Array.from(this.state.bingoBoard[e.target.value])
+    const drawnBalls = Array.from(this.state.bingo.drawn_balls)
+    const url = 'http://localhost:3000/bingo'
+    axios.post(url, {
+      bingoBoardValues,
+      drawnBalls
+    })
+      .then((response) => {
+        const result = response.data
+        if (result) {
+          this.setState(
+            {
+              bingo: {game_mode: 'off'},
+              modal: {title: 'Congratulations', body: 'Bingo!, you won!'}
+            }
+          )
+        } else {
+          this.setState(
+            {
+              bingo: {game_mode: 'paused'},
+              modal: {title: 'Sorry', body: 'It is not Bingo!'}
+            }
+          )
+        }
+        console.log(response.data)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }
 }
 
-User.propTypes = propTypes
 export default User

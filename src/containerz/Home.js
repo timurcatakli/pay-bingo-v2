@@ -1,18 +1,15 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { Jumbotron } from 'react-bootstrap'
 
 const Home = () => (
-  <div>
-    <h1>Home - Welcome to the Tornadoes Website!</h1>
-    <nav>
-      <ul>
-        <li><Link to='/'>Home</Link></li>
-        <li><Link to='/user'>User</Link></li>
-        <li><Link to='/admin'>Admin</Link></li>
-      </ul>
-    </nav>
-
-  </div>
+  <Jumbotron>
+    <h3>PayPal Bingo</h3>
+    <p>Please open Player and Admin pages on separate windows</p>
+    <Link to="/user">Player Screen</Link>
+    &nbsp; &nbsp; &nbsp; &nbsp;
+    <Link to="/admin" target="_blank">Admin Screen</Link>
+  </Jumbotron>
 )
 
 export default Home

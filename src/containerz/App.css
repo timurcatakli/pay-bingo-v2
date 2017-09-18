@@ -1,9 +1,9 @@
 body {
   background-color: #dddddd;
+  margin-top: 10px;
 }
 
 main {
-  width: 960px;
   text-align: center;
   margin: 0 auto;
 }
@@ -20,6 +20,16 @@ main {
 }
 
 .btn-default {
+  width: 12%;
+  font-size: 120px;
+  background-color: lightgray;
+  text-align: center;
+  padding: 18px;
+  border-bottom: 1px solid gray;
+  border-right: 1px solid gray;
+}
+
+.xxx {
   width: 12%;
   font-size: 120px;
   background-color: lightgray;

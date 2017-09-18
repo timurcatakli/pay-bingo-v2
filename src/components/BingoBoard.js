@@ -5,8 +5,11 @@ import '../containerz/App.css'
 
 const propTypes = {
   bingo: PropTypes.object.isRequired,
-  bingoBoard: PropTypes.object
+  value: PropTypes.string.isRequired,
+  bingoBoard: PropTypes.object,
+  onBingoClaim: PropTypes.func.isRequired
 }
+
 const style = {
   button: {
     fontSize: '24px',
@@ -14,22 +17,26 @@ const style = {
     height: '60px'
   },
   buttonToolbar: {
-    width: '320px',
     marginBottom: '40px'
   }
 }
+
 const BingoBoard = (props) => {
-  const bingoBoard = props.bingoBoard || new Set()
+  const {bingoBoard = new Set(), onBingoClaim, value} = props
   const drawnBalls = props.bingo.drawn_balls || new Set()
+  const bingoButtonDisabled = drawnBalls.size === 0 ? true : false
   const boardEntries = Array.from(bingoBoard.values()).map((ball, index) => {
     const selectedStyle = drawnBalls.has(ball) ? 'success' : 'default'
-    const tag = <Button key={`key-${index}`} bsStyle={selectedStyle} style={style.button}>{ball}</Button>
+    const divider = (index + 1) % 5 === 0 ? <br/> : null
+    const tag = <span key={`key-${index}`}><Button bsStyle={selectedStyle} style={style.button}>{ball}</Button>{divider}</span>
     return tag
   })
   return (
-    <ButtonToolbar style={style.buttonToolbar}>
-      <ButtonGroup>{boardEntries}</ButtonGroup>
-    </ButtonToolbar>
+    <ButtonGroup>
+      {boardEntries}
+      <br />
+      <center><Button bsStyle="info" disabled={bingoButtonDisabled} onClick={onBingoClaim} value={value}>BINGO!</Button></center>
+    </ButtonGroup>
   )
 }
 

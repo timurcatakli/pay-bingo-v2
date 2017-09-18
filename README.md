@@ -14,3 +14,8 @@ Start: node .
 // start game
 serves 4 bingo cards
 set status on
+
+pause game is not functional
+new game does not reset drawn balls
+
+css leri inline yap css den kurtil

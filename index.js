@@ -18,10 +18,11 @@ const io = socketIo(server)
 // we connect webpack in order to utilize one (single) IP
 app.use(express.static(__dirname + '/public'))
 app.use(webpackDevMiddleware(webpack(webpackConfig)))
-app.use(bodyParser.urlencoded({ extended: false }))
-
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
 // Handles all routes so you do not get a not found error
-app.get('*', (request, response) => {
+
+app.get(['/admin', '/user'], (request, response) => {
   response.sendFile(path.resolve(__dirname, 'public', 'index.html'))
 })
 
@@ -35,4 +36,5 @@ io.on('connection', socket => {
 // start listening for HTTP requests on specificed port.
 const port = 3000
 // start server to listen not the app so that socket.io can broadcast
+require('./app/routes')(app, {})
 server.listen(port)
