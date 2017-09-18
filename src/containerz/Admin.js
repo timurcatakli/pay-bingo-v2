@@ -8,7 +8,7 @@ class Admin extends React.Component {
     super(props)
     this.state = {
       bingo: {
-        game_mode: 'off', // off - on - paused
+        game_mode: false,
         drawn_balls: []
       }
     }
@@ -23,12 +23,11 @@ class Admin extends React.Component {
 
   render() {
     const gameMode = this.state.bingo.game_mode
-    const gameOn = gameMode === 'on' ? true : false
     return (
       <Jumbotron>
         <h3>Admin Console</h3>
         <p>
-          {gameOn
+          {gameMode
             ?
             <Button bsStyle="primary" onClick={this.handlePause}>Pause Game</Button>
             :
@@ -36,26 +35,10 @@ class Admin extends React.Component {
           }
 
           &nbsp; &nbsp; &nbsp; &nbsp;
-          <Button bsStyle="success" disabled={!gameOn} onClick={this.handleDrawBall}>Draw Ball</Button>
+          <Button bsStyle="success" disabled={!gameMode} onClick={this.handleDrawBall}>Draw Ball</Button>
         </p>
       </Jumbotron>
     )
-  }
-
-  handleDrawBall = () => {
-    const url = 'http://localhost:3000/bingo/drawnballs'
-    axios.get(url)
-      .then((response) => {
-        const bingo = Object.assign(this.state.bingo)
-        if (bingo.game_mode === 'on') {
-          bingo.drawn_balls = response.data
-          this.setState({bingo})
-          this.socket.emit('bingo', bingo)
-        }
-      })
-      .catch((error) => {
-        console.log(error)
-      })
   }
 
   setAndEmit = (obj) => {
@@ -63,16 +46,30 @@ class Admin extends React.Component {
     this.socket.emit('bingo', obj)
   }
 
+  handleDrawBall = () => {
+    const url = 'http://localhost:3000/bingo/drawnballs'
+    axios.get(url)
+      .then((response) => {
+        const bingo = Object.assign(this.state.bingo)
+        bingo.drawn_balls = response.data
+        this.setAndEmit(bingo)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }
+
+
   handleStart = () => {
     const bingo = Object.assign(this.state.bingo)
-    bingo.game_mode = 'on'
+    bingo.game_mode = true
     this.setAndEmit(bingo)
   }
 
   handlePause = () => {
     // immutable copy
     const bingo = Object.assign(this.state.bingo)
-    bingo.game_mode = 'paused'
+    bingo.game_mode = false
     this.setAndEmit(bingo)
   }
 }

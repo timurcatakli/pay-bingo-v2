@@ -12,7 +12,7 @@ class User extends React.Component {
     super(props)
     this.state = {
       bingo: {},
-      bingoBoard: new Set(),
+      bingoBoard: [],
       modal: {
         title: 'PayPal Bingo Game',
         body: 'Your Admin will start the game soon!'
@@ -20,30 +20,31 @@ class User extends React.Component {
     }
   }
 
-  componentDidMount() {
+  componentWillMount() {
     this.setState({bingoBoard: generateBingoBoard()})
     this.socket = io('/')
     this.socket.on('bingo', bingo => {
       const immutableBingo = Object.assign(bingo)
-      immutableBingo.drawn_balls = new Set(bingo.drawn_balls)
+      immutableBingo.drawn_balls = [...bingo.drawn_balls]
       this.setState({bingo: immutableBingo})
     })
   }
 
   render() {
-    const gameMode = this.state.bingo.game_mode
-    const bingoObject = this.state.bingo
-    const showModal = gameMode === 'on' ? false : true
+    const {bingo} = this.state
+    const gameMode = bingo.game_mode
+    const drawnBalls = bingo.drawn_balls
+    const showModal = gameMode ? false : true
     return (
       <Grid>
         <Row>
-          <Col md={12}><ScoreBoard bingo={bingoObject} /></Col>
+          <Col md={12}><ScoreBoard drawnBalls={drawnBalls} /></Col>
         </Row>
         <Row style={{marginBottom: '40px'}}>
           <Col md={6}>
             <BingoBoard
               bingoBoard={this.state.bingoBoard[0]}
-              bingo={bingoObject}
+              drawnBalls={drawnBalls}
               onBingoClaim={this.handleBingoClaim}
               value="0"
             />
@@ -51,7 +52,7 @@ class User extends React.Component {
           <Col md={6}>
             <BingoBoard
               bingoBoard={this.state.bingoBoard[1]}
-              bingo={bingoObject}
+              drawnBalls={drawnBalls}
               onBingoClaim={this.handleBingoClaim}
               value="1"
             />
@@ -61,7 +62,7 @@ class User extends React.Component {
           <Col md={6}>
             <BingoBoard
               bingoBoard={this.state.bingoBoard[2]}
-              bingo={bingoObject}
+              drawnBalls={drawnBalls}
               onBingoClaim={this.handleBingoClaim}
               value="2"
             />
@@ -69,7 +70,7 @@ class User extends React.Component {
           <Col md={6}>
             <BingoBoard
               bingoBoard={this.state.bingoBoard[3]}
-              bingo={bingoObject}
+              drawnBalls={drawnBalls}
               onBingoClaim={this.handleBingoClaim}
               value="3"
             />
@@ -84,9 +85,15 @@ class User extends React.Component {
     )
   }
 
+  setAndEmit = (obj) => {
+    this.setState({bingo: obj})
+    this.socket.emit('bingo', obj)
+  }
+
   handleBingoClaim = (e) => {
+    const bingo = Object.assign(this.state.bingo)
     const bingoBoardValues = Array.from(this.state.bingoBoard[e.target.value])
-    const drawnBalls = Array.from(this.state.bingo.drawn_balls)
+    const drawnBalls = [...this.state.bingo.drawn_balls]
     const url = 'http://localhost:3000/bingo'
     axios.post(url, {
       bingoBoardValues,
@@ -97,19 +104,20 @@ class User extends React.Component {
         if (result) {
           this.setState(
             {
-              bingo: {game_mode: 'off'},
+              bingo: {game_mode: false},
               modal: {title: 'Congratulations', body: 'Bingo!, you won!'}
             }
           )
         } else {
           this.setState(
             {
-              bingo: {game_mode: 'paused'},
+              bingo: {game_mode: false},
               modal: {title: 'Sorry', body: 'It is not Bingo!'}
             }
           )
         }
-        console.log(response.data)
+        bingo.game_mode = false
+        this.socket.emit('bingo', bingo)
       })
       .catch((error) => {
         console.log(error)

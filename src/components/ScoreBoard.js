@@ -12,21 +12,18 @@ const style = {
   }
 }
 const propTypes = {
-  bingo: PropTypes.shape({
-    game_mode: PropTypes.oneOf(['on', 'off', 'paused']),
-    drawn_balls: PropTypes.object
-  })
+  drawnBalls: PropTypes.array
 }
 
 const ScoreBoard = (props) => {
-  const {bingo} = props
-  const drawnBalls = bingo.drawn_balls ? Array.from(bingo.drawn_balls) : []
-  const gameOn = drawnBalls.length > 0 ? true : false
+  const {drawnBalls = []} = props
+  const immutableDrawnBalls = [...drawnBalls]
+  const gameOn = immutableDrawnBalls.length > 0 ? true : false
   let lastBall = null
   let previousBalls = null
-  if (drawnBalls.length > 0) {
-    lastBall = drawnBalls.pop()
-    previousBalls = drawnBalls.reverse().map((ball, index) => {
+  if (immutableDrawnBalls.length > 0) {
+    lastBall = immutableDrawnBalls.pop()
+    previousBalls = immutableDrawnBalls.reverse().map((ball, index) => {
       return <Button style={style.button} key={index}>{ball}</Button>
     })
   }
@@ -50,7 +47,6 @@ const ScoreBoard = (props) => {
           <Row>
             <Col md={12}><h3>First ball will be drawn soon...</h3></Col>
           </Row>
-
         </Grid>
       }
     </Jumbotron>
