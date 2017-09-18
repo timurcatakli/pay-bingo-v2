@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { ButtonGroup, Button } from 'react-bootstrap'
-import '../containerz/App.css'
 
 const propTypes = {
   drawnBalls: PropTypes.array,

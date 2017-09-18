@@ -1,13 +1,21 @@
 import React from 'react'
 import { Switch, Route } from 'react-router-dom'
-import { Jumbotron, Button, Grid, Col, Row } from 'react-bootstrap'
+import { Grid, Col, Row } from 'react-bootstrap'
 import Home from './Home'
 import User from './User'
 import Admin from './Admin'
-import './App.css'
 
+const style = {
+  main: {
+    paddingBottom: '40px',
+    paddingTop: '10px',
+    backgroundColor: '#dddddd',
+    textAlign: 'center',
+    margin: '0 auto'
+  }
+}
 const Routes = () => (
-  <main style={{marginBottom: '40px'}}>
+  <main style={style.main}>
     <Grid>
       <Row>
         <Col md={12} className="text-right">

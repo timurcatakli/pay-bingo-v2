@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Jumbotron, Button, Grid, Col, Row } from 'react-bootstrap'
-import '../containerz/App.css'
 
 const style = {
   button: {

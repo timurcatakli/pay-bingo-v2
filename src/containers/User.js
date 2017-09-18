@@ -11,12 +11,13 @@ class User extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      bingo: {},
-      bingoBoard: [],
-      modal: {
-        title: 'PayPal Bingo Game',
-        body: 'Your Admin will start the game soon!'
-      }
+      bingo: {
+        modal: {
+          title: 'PayPal Bingo Game',
+          body: 'Your Admin will start the game soon!'
+        }
+      },
+      bingoBoard: []
     }
   }
 
@@ -24,14 +25,16 @@ class User extends React.Component {
     this.setState({bingoBoard: generateBingoBoard()})
     this.socket = io('/')
     this.socket.on('bingo', bingo => {
-      const immutableBingo = Object.assign(bingo)
-      immutableBingo.drawn_balls = [...bingo.drawn_balls]
+      console.log(bingo)
+      const immutableBingo = Object.assign(bingo) || {}
+      const drawnBalls = bingo.drawn_balls || []
+      immutableBingo.drawn_balls = [...drawnBalls]
       this.setState({bingo: immutableBingo})
     })
   }
 
   render() {
-    const {bingo} = this.state
+    const {bingo, bingoBoard} = this.state
     const gameMode = bingo.game_mode
     const drawnBalls = bingo.drawn_balls
     const showModal = gameMode ? false : true
@@ -43,7 +46,7 @@ class User extends React.Component {
         <Row style={{marginBottom: '40px'}}>
           <Col md={6}>
             <BingoBoard
-              bingoBoard={this.state.bingoBoard[0]}
+              bingoBoard={bingoBoard[0]}
               drawnBalls={drawnBalls}
               onBingoClaim={this.handleBingoClaim}
               value="0"
@@ -51,7 +54,7 @@ class User extends React.Component {
           </Col>
           <Col md={6}>
             <BingoBoard
-              bingoBoard={this.state.bingoBoard[1]}
+              bingoBoard={bingoBoard[1]}
               drawnBalls={drawnBalls}
               onBingoClaim={this.handleBingoClaim}
               value="1"
@@ -61,7 +64,7 @@ class User extends React.Component {
         <Row>
           <Col md={6}>
             <BingoBoard
-              bingoBoard={this.state.bingoBoard[2]}
+              bingoBoard={bingoBoard[2]}
               drawnBalls={drawnBalls}
               onBingoClaim={this.handleBingoClaim}
               value="2"
@@ -69,7 +72,7 @@ class User extends React.Component {
           </Col>
           <Col md={6}>
             <BingoBoard
-              bingoBoard={this.state.bingoBoard[3]}
+              bingoBoard={bingoBoard[3]}
               drawnBalls={drawnBalls}
               onBingoClaim={this.handleBingoClaim}
               value="3"
@@ -77,8 +80,8 @@ class User extends React.Component {
           </Col>
         </Row>
         <NotificationModal
-          title={this.state.modal.title}
-          body={this.state.modal.body}
+          title={bingo.modal.title}
+          body={bingo.modal.body}
           show={showModal}
         />
       </Grid>
@@ -104,15 +107,19 @@ class User extends React.Component {
         if (result) {
           this.setState(
             {
-              bingo: {game_mode: false},
-              modal: {title: 'Congratulations', body: 'Bingo!, you won!'}
+              bingo: {
+                game_mode: false,
+                modal: {title: 'Congratulations', body: 'Bingo!, you won!'}
+              }
             }
           )
         } else {
           this.setState(
             {
-              bingo: {game_mode: false},
-              modal: {title: 'Sorry', body: 'It is not Bingo!'}
+              bingo: {
+                game_mode: false,
+                modal: {title: 'Sorry', body: 'It is not Bingo!'}
+              }
             }
           )
         }
